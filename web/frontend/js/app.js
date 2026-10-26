@@ -3143,6 +3143,9 @@ function closeWizardLoadingModal() {
 function closeWizardModal() {
   closeWizardLoadingModal();
   document.getElementById('modal-wizard')?.classList.remove('open');
+  // Do not carry the display name of the previous app into the next wizard run
+  const dn = document.getElementById('wiz-display-name');
+  if (dn) dn.value = '';
 }
 
 function updateWizardStepView(step) {
@@ -3914,10 +3917,12 @@ async function wizardSubmitApp() {
   const repos = Array.from(state.wizard.repos);
   const aliases = collectAliasData(true);
 
+  const displayName = (document.getElementById('wiz-display-name')?.value || '').trim();
   const payload = {
     package: pkg,
     repos: repos,
     patch_aliases: aliases,
+    ...(displayName ? { display_name: displayName } : {}),
   };
 
   const btnSave = document.getElementById('btn-wiz-save');
